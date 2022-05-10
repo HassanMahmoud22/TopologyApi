@@ -23,6 +23,7 @@
         "max": 4
       },
       "netlist": {
+        "id": "net2",
         "drain": "n2",
         "gate": "vin2",
         "source": "vss2"

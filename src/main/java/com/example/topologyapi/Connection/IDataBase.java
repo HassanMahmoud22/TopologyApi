@@ -1,15 +1,18 @@
 package com.example.topologyapi.Connection;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.FileNotFoundException;
 
 public interface IDataBase {
-    void readJSON(@RequestBody String file) throws ParseException, FileNotFoundException;
-    void writeJSON(@RequestBody String topologyId) throws ParseException;
-    JSONArray queryDevices(String topologyId);
-    void deleteTopology(String topologyId) throws ParseException;
+    ResponseEntity<JSONObject> readJSON(@RequestBody String file) throws ParseException, FileNotFoundException;
+    ResponseEntity<JSONObject> writeJSON(@RequestBody String topologyId) throws ParseException;
+    ResponseEntity<JSONArray> queryDevices(String topologyId);
+    ResponseEntity<JSONObject> deleteTopology(String topologyId) throws ParseException;
     JSONArray queryTopologies();
+    ResponseEntity<JSONArray> queryDevicesToNetlist(String topologyId, String netlistId);
 }

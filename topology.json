@@ -10,6 +10,7 @@
         "max": 1000
       },
       "netlist": {
+        "id": "net1",
         "t1": "vdd",
         "t2": "n1"
       }
@@ -23,6 +24,7 @@
         "max": 2
       },
       "netlist": {
+        "id": "net1",
         "drain": "n1",
         "gate": "vin",
         "source": "vss"

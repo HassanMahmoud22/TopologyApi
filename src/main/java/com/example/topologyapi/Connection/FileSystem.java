@@ -5,6 +5,8 @@ import com.example.topologyapi.TopologyComponent.TopologyComponent;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -20,12 +22,24 @@ public class FileSystem implements IDataBase{
         topologies =  new ArrayList<>();
     }
 
-    public void readJSON(String fileName) {
+    public boolean exist(String id){
+        for (Topology topology : topologies) {
+            if (topology.getId().equals(id))
+                return true;
+        }
+        return false;
+    }
+
+    public ResponseEntity<JSONObject> readJSON(String fileName) {
+        JSONObject message = new JSONObject();
         JSONParser parser = new JSONParser();
         Topology topology = new Topology();
         try {
             Object obj = parser.parse(new FileReader(fileName));
             JSONObject jsonObject = (JSONObject)obj;
+            String id = (String)jsonObject.get("id");
+            if(exist(id))
+                deleteTopology(id);
             topology.setId((String)jsonObject.get("id"));
             JSONArray components = (JSONArray)jsonObject.get("components");
             for (Object o : components) {
@@ -66,23 +80,28 @@ public class FileSystem implements IDataBase{
                 topology.setComponent(topologyComponent);
             }
             topologies.add(topology);
-            System.out.println("Topology is read Successfully");
+            message.put("message", "Topology is read Successfully");
+            return new ResponseEntity<JSONObject>(message,HttpStatus.OK);
         } catch(Exception e) {
-            e.printStackTrace();
+            message.put("message", "This File Doesn't Exist");
+            return new ResponseEntity<JSONObject>(message,HttpStatus.NOT_FOUND);
         }
+    }
+    private void convertComponent(TopologyComponent component, JSONArray components){
+        JSONObject jsonComponent = new JSONObject();
+        JSONObject jsonNetlist = new JSONObject();
+        JSONObject jsonDetails = new JSONObject();
+        jsonComponent.put("type", component.getType());
+        jsonComponent.put("id", component.getId());
+        jsonDetails.putAll(component.getComponentDetails());
+        jsonNetlist.putAll(component.getNetlist());
+        jsonComponent.put(component.getName(), jsonDetails);
+        jsonComponent.put("netlist", jsonNetlist);
+        components.add(jsonComponent);
     }
     private void convertComponents(Topology topology, JSONArray components) {
         for(TopologyComponent component: topology.getComponentList()){
-            JSONObject jsonComponent = new JSONObject();
-            JSONObject jsonNetlist = new JSONObject();
-            JSONObject jsonDetails = new JSONObject();
-            jsonComponent.put("type", component.getType());
-            jsonComponent.put("id", component.getId());
-            jsonDetails.putAll(component.getComponentDetails());
-            jsonNetlist.putAll(component.getNetlist());
-            jsonComponent.put(component.getName(), jsonDetails);
-            jsonComponent.put("netlist", jsonNetlist);
-            components.add(jsonComponent);
+            convertComponent(component, components);
         }
     }
     private Topology getTopologyById(String topologyId){
@@ -93,7 +112,8 @@ public class FileSystem implements IDataBase{
         }
         return nullTopology;
     }
-    public void writeJSON(String topologyId) {
+    public ResponseEntity<JSONObject> writeJSON(String topologyId) {
+        JSONObject message = new JSONObject();
         Topology topology = getTopologyById(topologyId);
         if(topology.getId()!=null){
             String path = "E:\\TopolgyApi\\topology3.json";
@@ -104,35 +124,42 @@ public class FileSystem implements IDataBase{
             jsonTopology.put("components", components);
             try (PrintWriter out = new PrintWriter(new FileWriter(path))) {
                 out.write(jsonTopology.toString());
-                System.out.println("The Topology is written successfully");
+                message.put("message", "The Topology is written successfully");
+                return new ResponseEntity<JSONObject>(message, HttpStatus.OK);
             } catch (Exception e) {
-                e.printStackTrace();
+                message.put("message", "The File Doesn't Exist");
+                return new ResponseEntity<JSONObject>(message, HttpStatus.NOT_FOUND);
             }
         }
-        else
-            System.out.println("There's no Topology stored in Memory with this Id");
+        else{
+            message.put("message", "There's no Topology stored in Memory with this Id");
+            return new ResponseEntity<JSONObject>(message, HttpStatus.NOT_FOUND);
+        }
     }
-    public JSONArray queryDevices(String topologyId){
+    public ResponseEntity<JSONArray> queryDevices(String topologyId){
         Topology topology = getTopologyById(topologyId);
         if(topology.getId()!=null){
             JSONArray components = new JSONArray();
             convertComponents(topology, components);
-            return components;
+            return new ResponseEntity<JSONArray>(components, HttpStatus.OK);
         }
-        return new JSONArray();
+        return new ResponseEntity<JSONArray>(new JSONArray(), HttpStatus.NOT_FOUND);
     }
-    public void deleteTopology(String topologyId) {
+
+    public  ResponseEntity<JSONObject> deleteTopology(String topologyId) {
+        JSONObject message = new JSONObject();
         boolean deleted = false;
         for(Topology topology: topologies){
             if(topology.getId().equals(topologyId)){
                 topologies.remove(topology);
                 deleted = true;
-                System.out.println("Topology Deleted Successfully");
-                break;
+                message.put("message", "Topology Deleted Successfully");
+                return new ResponseEntity<JSONObject>(message, HttpStatus.OK);
             }
         }
         if(!deleted)
-            System.out.println("There's no Topology stored in Memory with this Id");
+            message.put("message", "There's no Topology stored in Memory with this Id");
+        return new ResponseEntity<JSONObject>(message, HttpStatus.NOT_FOUND);
     }
 
     public JSONArray queryTopologies(){
@@ -147,4 +174,19 @@ public class FileSystem implements IDataBase{
         }
         return jsonTopologies;
     }
+
+    public ResponseEntity<JSONArray> queryDevicesToNetlist(String topologyId, String netlistId){
+        Topology topology = getTopologyById(topologyId);
+        JSONArray components = new JSONArray();
+        if(topology.getId()!=null){
+            for(TopologyComponent component: topology.getComponentList()){
+                if(component.getNetlist().get("id").equals(netlistId)){
+                    convertComponent(component, components);
+                }
+            }
+            return new ResponseEntity<JSONArray>(components, HttpStatus.OK);
+        }
+        return new ResponseEntity<JSONArray>(new JSONArray(), HttpStatus.NOT_FOUND);
+    }
+
 }
