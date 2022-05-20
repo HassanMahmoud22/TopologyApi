@@ -1,4 +1,4 @@
-package com.example.topologyapi.TopologyOperations;
+package com.example.topologyoperations;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -14,6 +14,6 @@ public interface ITopologyOperations {
     ResponseEntity<JSONObject> readJSON(@RequestBody String file) throws ParseException, FileNotFoundException;
     ResponseEntity<JSONObject> writeJSON(@RequestBody String topologyId) throws ParseException;
     ResponseEntity<JSONObject> deleteTopology(@RequestBody String topologyId) throws ParseException;
-    public ResponseEntity<JSONArray> queryDevices(@RequestBody String topologyId) throws ParseException;
-    public ResponseEntity<JSONArray> queryDevicesToNetlist(@RequestBody String ids) throws ParseException;
+    ResponseEntity<JSONArray> queryDevices(@RequestBody String topologyId) throws ParseException;
+    ResponseEntity<JSONArray> queryDevicesToNetlist(@RequestBody String ids) throws ParseException;
 }

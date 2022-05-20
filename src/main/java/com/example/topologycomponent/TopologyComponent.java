@@ -1,4 +1,4 @@
-package com.example.topologyapi.TopologyComponent;
+package com.example.topologycomponent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ public class TopologyComponent {
     String type;
     String name;
     Map<String, String> componentDetails = new HashMap<>();
-    Map<String, String> netlist = new HashMap<>();
+    Map<String, String> netList = new HashMap<>();
 
     public String getId() {
         return id;
@@ -39,18 +39,18 @@ public class TopologyComponent {
         this.componentDetails = componentDetails;
     }
 
-    public Map<String, String> getNetlist() {
-        return netlist;
+    public Map<String, String> getNetList() {
+        return netList;
     }
 
-    public void setNetlist( Map<String, String> netlist) {
-        this.netlist = netlist;
+    public void setNetList( Map<String, String> netList) {
+        this.netList = netList;
     }
 
     @Override
     public String toString() {
-        return "component id " + getId() + " \n component type: " + getType() + " \n componentdetails: " + getComponentDetails()
-                + " \n componentNetlist: " + getNetlist();
+        return "component id " + getId() + " \n component type: " + getType() + " \n componentDetails: " + getComponentDetails()
+                + " \n componentNetList: " + getNetList();
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.topologyapi.Connection;
+package com.example.connection;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -14,5 +14,5 @@ public interface IDataBase {
     ResponseEntity<JSONArray> queryDevices(String topologyId);
     ResponseEntity<JSONObject> deleteTopology(String topologyId) throws ParseException;
     JSONArray queryTopologies();
-    ResponseEntity<JSONArray> queryDevicesToNetlist(String topologyId, String netlistId);
+    ResponseEntity<JSONArray> queryDevicesToNetList(String topologyId, String netListId);
 }

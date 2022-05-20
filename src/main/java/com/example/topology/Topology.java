@@ -1,6 +1,6 @@
-package com.example.topologyapi.Topology;
+package com.example.topology;
 
-import com.example.topologyapi.TopologyComponent.TopologyComponent;
+import com.example.topologycomponent.TopologyComponent;
 
 import java.util.ArrayList;
 import java.util.List;
