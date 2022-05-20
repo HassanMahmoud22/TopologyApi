@@ -2,9 +2,6 @@
 
 ## About
 
-An API (JSON file) that has the data about topologies that consists of electronic components.
-
-
 A topology is a set of electronic components that are connected together.
 
 ## Description
